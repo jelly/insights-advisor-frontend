@@ -18,6 +18,8 @@ import { redirectToInventoryList } from './helpers';
 import { useDispatch } from 'react-redux';
 import { toggleDrawer } from '../../store/actions';
 
+import axios from 'axios';
+
 /**
  * Top inventory bar with title, buttons (namely remove from inventory and inventory detail button) and actions.
  * Remove from inventory button requires remove modal, which is included at bottom of this component.
@@ -50,6 +52,21 @@ const TopBar = ({
         }] : []),
         ... actions || []
     ];
+
+    const openCockpit = () => {
+        console.log('open Cockpit');
+        axios({
+            method: 'post',
+            url: '/apps/cockpit/api/webconsole/v1/sessions/new',
+            auth: {
+                username: 'admin',
+                password: 'foobar'
+            }
+        }).then(r => {
+            console.log(r);
+            window.open(`https://localhost:8443/wss/webconsole/v1/sessions/${r.data.id}/web/`, '_blank');
+        }).catch(r => console.error(r));
+    };
 
     return (
         <Split className="ins-c-inventory__detail--header">
@@ -84,6 +101,16 @@ const TopBar = ({
                     {
                         loaded ?
                             <Flex>
+                                <FlexItem>
+                                    <ActionsWrapper>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={ () => openCockpit() }
+                                        >
+                                          Open Cockpit
+                                        </Button>
+                                    </ActionsWrapper>
+                                </FlexItem>
                                 {showDelete && <FlexItem>
                                     <DeleteWrapper>
                                         <Button

@@ -24,9 +24,11 @@ const { config: webpackConfig, plugins } = config({
                 ...(process.env.LOCAL_API.split(',') || []).reduce((acc, curr) => {
                     const [appName, appConfig] = (curr || '').split(':');
                     const [appPort = 8003, protocol = 'http'] = appConfig.split('~');
+                    const appPrefix = {};
+                    appPrefix[`^/apps/${appName}`] = '';
                     return {
                         ...acc,
-                        [`/apps/${appName}`]: { host: `${protocol}://localhost:${appPort}` },
+                        [`/apps/${appName}`]: { host: `${protocol}://localhost:${appPort}`, pathRewrite: appPrefix },
                         // [`/insights/${appName}`]: { host: `${protocol}://localhost:${appPort}` },
                         // [`/beta/insights/${appName}`]: { host: `${protocol}://localhost:${appPort}` },
                         [`/beta/apps/${appName}`]: { host: `${protocol}://localhost:${appPort}` }
@@ -38,7 +40,7 @@ const { config: webpackConfig, plugins } = config({
     ...process.env.MOCK && {
         customProxy: [
             {
-                context: ['/api/inventory/v1/groups'], // you can adjust the `context` value to redirect only specific endpoints
+                context: ['/api/inventory/v1/groups', '/api/inventory/v1/hosts'], // you can adjust the `context` value to redirect only specific endpoints
                 target: 'http://localhost:4010', // default prism port
                 secure: false,
                 changeOrigin: true,
