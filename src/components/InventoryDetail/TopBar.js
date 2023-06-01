@@ -54,17 +54,22 @@ const TopBar = ({
     ];
 
     const openCockpit = () => {
-        console.log('open Cockpit');
+        console.debug('open Cockpit', entity);
+        const bodyFormData = new FormData();
+        bodyFormData.append('inventory_id', entity?.id);
+
         axios({
             method: 'post',
             url: '/apps/cockpit/api/webconsole/v1/sessions/new',
+            data: bodyFormData,
+            headers: { 'Content-Type': 'multipart/form-data' },
             auth: {
                 username: 'admin',
                 password: 'foobar'
             }
         }).then(r => {
-            console.log(r);
-            window.open(`https://localhost:8443/wss/webconsole/v1/sessions/${r.data.id}/web/`, '_blank');
+            console.debug(r);
+            window.open(`https://localhost:8443/wss/webconsole/v1/sessions/${r.data.id}/web/system`, '_blank');
         }).catch(r => console.error(r));
     };
 
